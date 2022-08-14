@@ -12,6 +12,7 @@ pipeline
                            pwd
                            ls
                            echo "this is build stage"
+                           '''
                       }
                 }
                stage('DEPLOY')
