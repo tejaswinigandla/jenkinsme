@@ -1,47 +1,37 @@
 pipeline {
-    agent none 
-    stages {
-        stage('ALL') {
-            parallel {
-stage('BUILD') {
-    agent any
-    steps {
-        sh '''
-            #!/bin/bash 
-            pwd 
-            ls
-            echo "This is a BUILD stage"
-            sleep 5
-        '''  
+    agent none
+
+    environment {
+        BRANCH = 'main'
+        GIT_REPO = 'https://github.com/tejaswinigandla/jenkins.git'
     }
-}
 
-                stage('DEPLOY') {
-                    agent any
-                    steps {
-                        echo "This is a DEPLOY stage"
-                        sh 'sleep 5'
-                    }
-                }
+    stages {
+        stage('Build') {
+            agent any
+            environment {
+                BUILD_ENV = 'only_for_build_stage'
+            }
+            steps {
+                git branch: env.BRANCH, url: env.GIT_REPO
+                sh '''
+                    #!/bin/bash 
+                    pwd 
+                    ls
+                    echo "This is a BUILD stage"
+                    sleep 5
+                '''  
+            }
+        }
 
-                stage('TESTING1') {
-                    agent { label 'slavenode_1' } 
-                    steps {
-                        sh 'echo "This is a TESTING1 stage"'
-                        sh 'sleep 5'
-                    }
-                }
-
-                stage('TESTING2') {
-                    agent { label 'slavenode_1' } 
-                    steps {
-                        sh '''
-                            echo "This is a TESTING2 stage"
-                            sleep 5
-                        '''
-                    }
-                }
-            }    
-        }    
+        stage('DEPLOY') {
+            agent any 
+            steps {
+                echo "This is a DEPLOY stage"
+                sh 'sleep 5'
+                echo "$BRANCH $GIT_REPO"
+                echo "$BUILD_ENV"
+            }
+        }
     }
 }
