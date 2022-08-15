@@ -1,7 +1,7 @@
 pipeline
 {
     agent { label 'node_1' }
-        stages
+    stages
           {
              stage('BUILD')
                {
