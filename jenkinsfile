@@ -12,6 +12,7 @@ pipeline
                            pwd
                            ls
                            echo "this is build stage"
+                           sleep 5
                            '''
                       }
                 }
@@ -20,6 +21,7 @@ pipeline
                       steps
                         {
                            echo "this is deploy stage"
+                           sh ' sleep 5 '
                         }
                  }
                 stage('TEST')
@@ -27,6 +29,7 @@ pipeline
                       steps
                        {
                          echo "this is test stage"
+                         sh ' sleep 5 '
                        }
                 }       
           }
