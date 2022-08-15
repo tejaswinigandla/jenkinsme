@@ -29,8 +29,6 @@ pipeline {
             steps {
                 echo "This is a DEPLOY stage"
                 sh 'sleep 5'
-                echo "$BRANCH $GIT_REPO"
-                echo "$BUILD_ENV"
             }
         }
     }
