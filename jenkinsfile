@@ -1,34 +1,48 @@
 pipeline {
     agent none
 
-    environment {
-        BRANCH = 'main'
-        GIT_REPO = 'https://github.com/tejaswinigandla/jenkins.git'
+    parameters {
+        string(name: 'BRANCH', description: 'Enter the branch to build', defaultValue: 'main')
+        string(name: 'GIT_REPO', description: 'Enter the repo url', defaultValue: 'https://github.com/tejaswinigandla/jenkins.git')
+        choice(name: 'STAGE', choices: ['build','deploy'], description: 'Stages to build')
     }
 
     stages {
         stage('Build') {
             agent any
-            environment {
-                BUILD_ENV = 'only_for_build_stage'
-            }
             steps {
-                git branch: env.BRANCH, url: env.GIT_REPO
-                sh '''
-                    #!/bin/bash 
-                    pwd 
-                    ls
-                    echo "This is a BUILD stage"
-                    sleep 5
-                '''  
+                script {
+                    if(params.STAGE == 'build')
+                    {
+                        git branch: params.BRANCH, url: params.GIT_REPO
+                        sh '''
+                            #!/bin/bash 
+                            pwd 
+                            ls
+                            echo "This is a BUILD stage"
+                            sleep 5
+                        '''
+                    } else { 
+                        echo "Skipping BUILD stage ....."    
+                    }  
+                }       
             }
         }
 
         stage('DEPLOY') {
-            agent any 
+            agent any
             steps {
-                echo "This is a DEPLOY stage"
-                sh 'sleep 5'
+                script {
+                    if(params.STAGE == 'deploy')
+                    {
+                        echo "This is a DEPLOY stage"
+                        sh 'sleep 5'
+                        echo "${params.BRANCH}"
+                        echo "${params.GIT_REPO}"
+                    } else {
+                        echo "Skipping DEPLOY stage ....."
+                    }
+                }       
             }
         }
     }
