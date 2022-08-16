@@ -1,43 +1,28 @@
 pipeline {
-    agent none
-
     parameters {
-        choice(name: 'STAGE', choices: ['build','deploy'], description: 'Stages to build')
+        string(name: 'AGENT', description: 'Enter the agent to run')
     }
-
+    agent { label params.name }
     stages {
         stage('Build') {
-            agent any
             steps {
-                script {
-                    if(params.STAGE == 'build')
-                    {
-                        sh '''
-                            #!/bin/bash 
-                            pwd 
-                            ls
-                            echo "This is a BUILD stage"
-                            sleep 5
-                        '''
-                    } else { 
-                        echo "Skipping BUILD stage "    
-                    }  
-                }       
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh '''
+                        #!/bin/bash 
+                        pwd 
+                        ls
+                        echo "This is a BUILD stage"
+                        sleep 5
+                        exit 1
+                    ''' 
+                }     
             }
         }
 
         stage('DEPLOY') {
-            agent any
             steps {
-                script {
-                    if(params.STAGE == 'deploy')
-                    {
-                        echo "This is a DEPLOY stage"
-                        sh 'sleep 5'
-                    } else {
-                        echo "Skipping DEPLOY stage "
-                    }
-                }       
+                echo "This is a DEPLOY stage"
+                sh 'sleep 5'
             }
         }
     }
