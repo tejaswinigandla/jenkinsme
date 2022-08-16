@@ -44,7 +44,7 @@ pipeline {
                 }       
             }
         }
-       stage('test') {
+       stage('TEST') {
             agent any
             steps {
                 script {
