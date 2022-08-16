@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('A') {
             steps {
-                catchError(AResult: 'SUCCESS', stageResult: 'FAILURE') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh '''
                         #!/bin/bash 
                         pwd 
