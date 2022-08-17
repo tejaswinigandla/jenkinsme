@@ -1,66 +1,41 @@
+def a_result = "false"
+
 pipeline {
-    agent none
+    agent any
 
-    parameters {
-                     choice(name: 'STAGE', choices: ['build','deploy','test'], description: 'Stages to build')
-               }
-      
     stages {
-               stage('Build')
-                {
-                    agent any
-                     steps {
-                             script {
-                                    if(params.STAGE == 'build')
-                                        {             
-                                          sh '''
-                                          #!/bin/bash 
-                                           pwd 
-                                          ls
-                                          echo "This is a BUILD stage"
-                                          sleep 5
-                                           '''
-                                         } 
-                                        else
-                                          { 
-                                                echo "Skipping BUILD stage "    
-                                           }  
-                                       }       
-                              }
-                     }
-
-           stage('DEPLOY') 
-             {
-                agent any
-                   steps {
-                        script {
-                    if(params.STAGE == 'deploy')
-                    {
-                        echo "This is a DEPLOY stage"
-                        sh 'sleep 5'
-                    } else {
-                        echo "Skipping DEPLOY stage "
-                    }
-                }       
+        stage('A') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+					script { 
+					    echo "Default Result "
+					    echo a_result
+						echo "Executing A"
+						a_result = "true"
+					}
+				}
             }
         }
-       stage('TEST') {
-            agent any
+        stage('B') {
             steps {
-                script {
-                    if(params.STAGE == 'test')
-                    {
-                        sh '''
-                            #!/bin/bash 
-                            pwd 
-                            ls
-                            echo "This is a TEST stage"
-                            sleep 5
-                        '''
-                    } else { 
-                        echo "Skipping TEST stage "    
-                    }  
-                }       
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    script { 
+						if ( a_result == "true" ) {
+							echo "Executing B"
+						}
+					}
+                }
+            }
+        }
+        stage('C') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    script { 
+						if ( a_result != "true" ) {
+							echo "Executing C"
+						}
+					}
+                }
             }
         }
     }
